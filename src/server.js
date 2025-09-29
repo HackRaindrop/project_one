@@ -1,0 +1,64 @@
+const http = require('http');
+const htmlResponses = require('./HTMLResponses.js');
+
+// Set port
+const port = process.env.PORT || process.env.NODE_PORT || 3000;
+
+// Parse body of request
+const parseBody = (request, response, handler) => {
+    const body = [];
+
+    // Handle errors    
+    request.on('error', (e) => {
+        console.dir(e);
+        response.statusCode = 400;
+        response.end();
+    });
+
+    // Add chunk to body
+    request.on('data', (chunk) => {
+        body.push(chunk);
+    });
+
+    // Parse body of request
+    request.on('end', () => {
+        const bodyString = Buffer.concat(body).toString();
+        request.body = JSON.parse(bodyString);
+        handler(request, response);
+    });
+};
+
+// Handle POST requests
+const handlePost = (request, response, parsedURL) => {
+    if (parsedURL.pathname === '/addUser') {
+        parseBody(request, response, jsonResponses.addUser);
+    }
+};
+
+// Handle GET requests
+const handleGet = (request, response, parsedURL) => {
+    switch (parsedURL.pathname) {
+        case '/style.css':
+            return htmlResponses.getCSS(request, response);
+        case '/':
+            return htmlResponses.getIndex(request, response);
+        default:
+            return htmlResponses.getIndex(request, response);
+    }
+};
+
+// Handle all requests
+const onRequest = (request, response) => {
+    const protocol = request.connection.encrypted ? 'https:' : 'http';
+    const parsedURL = new URL(request.url, `${protocol}://${request.headers.host}`);
+
+    if (request.method === 'POST') {
+        handlePost(request, response, parsedURL);
+    } else {
+        handleGet(request, response, parsedURL);
+    }
+};
+
+// Create server
+http.createServer(onRequest).listen(port);
+console.log(`Listening on 127.0.0.1: ${port}`);
