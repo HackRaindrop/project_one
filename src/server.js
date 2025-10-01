@@ -1,5 +1,6 @@
 const http = require('http');
 const htmlResponses = require('./HTMLResponses.js');
+const jsonResponses = require('./jsonResponses.js');
 
 // Set port
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
@@ -42,6 +43,14 @@ const handleGet = (request, response, parsedURL) => {
             return htmlResponses.getCSS(request, response);
         case '/':
             return htmlResponses.getIndex(request, response);
+        case '/getBooks':
+            return jsonResponses.getBooks(request, response);
+        case '/getAuthors':
+            return jsonResponses.getAuthors(request, response);
+        case '/getGenres':
+            return jsonResponses.getGenres(request, response);
+        case '/getLanguages':
+            return jsonResponses.getLanguages(request, response);
         default:
             return htmlResponses.getIndex(request, response);
     }

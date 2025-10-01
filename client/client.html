@@ -6,10 +6,124 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
+<script>
+    // Wait until DOM content is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get elements
+        const userForm = document.getElementById('getRequests');
+        const urlField = document.getElementById('urlField');
+        const content = document.getElementById('content');
+        //const nameForm = document.getElementById('nameForm')
+
+        content.innerHTML = '';
+
+        // Event listener for submission
+        userForm.addEventListener('submit', async (e) => {
+
+            e.preventDefault();
+            const url = urlField.value;
+
+            try {
+
+                // Make fetch request
+                const response = await fetch(url);
+
+                // Get text from response and display
+                const jsonResponse = await response.json();
+
+                // Show only JSON data for /getUsers
+                switch (url) {
+                    case "/getBooks":
+                        for (let i = 0; i < jsonResponse.length; i++) {
+                            content.innerHTML += `<h3>${JSON.stringify(jsonResponse[i].title)}</h3>\n`;
+                            content.innerHTML += `<h4>${JSON.stringify(jsonResponse[i].author)}</h3>`;
+                        } break;
+                    case "/getAuthors":
+                        content.innerHTML = `AUTHOR`;
+                        break;
+                    case "/getGenre":
+                        content.innerHTML = `Genres`;
+                        break;
+                    case "/getLanguage":
+                        content.innerHTML = `Languages`;
+                        break;
+                    default:
+                        break;
+                }
+            } catch (error) {
+                content.textContent = `${error.message}`;
+            }
+        });
+
+        // Event listener for new user form
+        // nameForm.addEventListener('submit', async (e) => {
+        //     e.preventDefault();
+
+        //     // Get form data
+        //     const formData = {
+        //         name: document.getElementById('nameField').value,
+        //         age: document.getElementById('ageField').value,
+        //     };
+        //     try {
+
+        //         // Make fetch request
+        //         const response = await fetch('/addUser', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify(formData),
+        //         });
+
+        //         let message = '';
+
+        //         // Handle 201 and 204 responses
+        //         if (response.status === 201 || response.status === 204) {
+        //             const statusText = response.status === 201 ? 'Created' : 'Updated (No Content)';
+
+        //             // Show message for 201 response
+        //             if (response.status === 201) {
+
+        //                 const jsonResponse = await response.json();
+        //                 console.log(jsonResponse);
+        //                 content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+
+        //             } else {
+
+        //                 // Show message for 204 response
+        //                 content.innerHTML = `<b>${statusText}</b>`;
+        //             }
+        //         } else {
+
+        //             // Show message for other responses
+        //             const jsonResponse = await response.json();
+        //             console.log(jsonResponse);
+        //             const statusText = response.status === 200 ? 'Success' : response.statusText;
+        //             content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+        //         }
+        //     } catch (error) {
+        //         content.textContent = `${error.message}`;
+        //     }
+        // });
+    });
+
+</script>
+
 <body>
     <section id="top">
         <h2>Book Search</h2>
+        <form id="getRequests" action="/getBooks" method="get">
+            <select id="urlField">
+                <option value="/getBooks">/getBooks</option>
+                <option value="/getAuthors">/getAuthors</option>
+                <option value="/getGenre">/getGenre</option>
+                <option value="/getLanguage">/getLanguage</option>
+            </select>
+            <input type="submit" value="Get Books">
 
+        </form>
+        <section id="content"></section>
     </section>
 </body>
 
