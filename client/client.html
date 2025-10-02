@@ -7,7 +7,6 @@
 </head>
 
 <script>
-    // Wait until DOM content is loaded
     document.addEventListener('DOMContentLoaded', () => {
 
         // Get elements
@@ -18,7 +17,6 @@
 
         content.innerHTML = '';
 
-        // Event listener for submission
         userForm.addEventListener('submit', async (e) => {
 
             e.preventDefault();
@@ -26,30 +24,57 @@
 
             try {
 
-                // Make fetch request
                 const response = await fetch(url);
-
-                // Get text from response and display
                 const jsonResponse = await response.json();
 
-                // Show only JSON data for /getUsers
-                switch (url) {
-                    case "/getBooks":
-                        for (let i = 0; i < jsonResponse.length; i++) {
-                            content.innerHTML += `<h3>${JSON.stringify(jsonResponse[i].title)}</h3>\n`;
-                            content.innerHTML += `<h4>${JSON.stringify(jsonResponse[i].author)}</h3>`;
-                        } break;
-                    case "/getAuthors":
-                        content.innerHTML = `AUTHOR`;
-                        break;
-                    case "/getGenre":
-                        content.innerHTML = `Genres`;
-                        break;
-                    case "/getLanguage":
-                        content.innerHTML = `Languages`;
-                        break;
-                    default:
-                        break;
+                // Clear previous content
+                content.innerHTML = '';
+
+                if (url === '/getBooks') {
+                    // Display books as nice cards
+                    content.innerHTML = `<h2>Found ${jsonResponse.length} books:</h2>`;
+
+                    // Create book cards
+                    jsonResponse.forEach(book => {
+                        content.innerHTML += `
+                            <div class="book-card">
+                                <h3>${book.title}</h3>
+                                <p><strong>Author:</strong> ${book.author}</p>
+                                <p><strong>Year:</strong> ${book.year}</p>
+                                <p><strong>Pages:</strong> ${book.pages}</p>
+                                <p><strong>Language:</strong> ${book.language}</p>
+                                <p><strong>Country:</strong> ${book.country}</p>
+                                ${book.genres ? `<p><strong>Genres:</strong> ${book.genres.join(', ')}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                } else if (url === '/getAuthors') {
+
+                    // Display authors
+                    let authorsList = '<ul class="simple-list">';
+                    jsonResponse.forEach(author => {
+                        authorsList += `<li>${author}</li>`;
+                    });
+                    authorsList += '</ul>';
+                    content.innerHTML = `<h2>All Authors (${jsonResponse.length}):</h2>${authorsList}`;
+                } else if (url === '/getGenres') {
+
+                    // Display genres
+                    let genresList = '<ul class="simple-list">';
+                    jsonResponse.forEach(genre => {
+                        genresList += `<li>${genre}</li>`;
+                    });
+                    genresList += '</ul>';
+                    content.innerHTML = `<h2>All Genres (${jsonResponse.length}):</h2>${genresList}`;
+                } else if (url === '/getLanguages') {
+                    
+                    // Display languages
+                    let languagesList = '<ul class="simple-list">';
+                    jsonResponse.forEach(language => {
+                        languagesList += `<li>${language}</li>`;
+                    });
+                    languagesList += '</ul>';
+                    content.innerHTML = `<h2>All Languages (${jsonResponse.length}):</h2>${languagesList}`;
                 }
             } catch (error) {
                 content.textContent = `${error.message}`;
@@ -117,8 +142,8 @@
             <select id="urlField">
                 <option value="/getBooks">/getBooks</option>
                 <option value="/getAuthors">/getAuthors</option>
-                <option value="/getGenre">/getGenre</option>
-                <option value="/getLanguage">/getLanguage</option>
+                <option value="/getGenres">/getGenres</option>
+                <option value="/getLanguages">/getLanguages</option>
             </select>
             <input type="submit" value="Get Books">
 
