@@ -24,16 +24,26 @@ const parseBody = (request, response, handler) => {
   // Parse body of request
   request.on('end', () => {
     const bodyString = Buffer.concat(body).toString();
-    request.body = JSON.parse(bodyString);
-    handler(request, response);
+    try {
+      request.body = JSON.parse(bodyString);
+      handler(request, response);
+    } catch (e) {
+      // Return 400 for invalid JSON
+      const errorMsg = { message: 'Bad Request: Invalid JSON' };
+      response.writeHead(400, { 'Content-Type': 'application/json' });
+      response.write(JSON.stringify(errorMsg));
+      response.end();
+    }
   });
 };
 
 // Handle POST requests
 const handlePost = (request, response, parsedURL) => {
   if (parsedURL.pathname === '/addUser') {
-    parseBody(request, response, jsonResponses.addUser);
+    return parseBody(request, response, jsonResponses.addUser);
   }
+  // Return 404 for unknown POST endpoints
+  return jsonResponses.notFound(request, response);
 };
 
 // Handle GET requests
@@ -52,7 +62,8 @@ const handleGet = (request, response, parsedURL) => {
     case '/getLanguages':
       return jsonResponses.getLanguages(request, response);
     default:
-      return htmlResponses.getIndex(request, response);
+      // Return 404 for unknown GET endpoints
+      return jsonResponses.notFound(request, response);
   }
 };
 

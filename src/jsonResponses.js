@@ -26,10 +26,15 @@ const getBooks = (request, response) => {
   // If limit is specified, only send that many books
   if (limit) {
     const numLimit = parseInt(limit, 10);
+    // Return 400 if limit is invalid
+    if (Number.isNaN(numLimit) || numLimit < 0) {
+      const errorMsg = { message: 'Bad Request: limit must be a positive number' };
+      return respondJSON(request, response, 400, errorMsg);
+    }
     result = books.slice(0, numLimit);
   }
 
-  respondJSON(request, response, 200, result);
+  return respondJSON(request, response, 200, result);
 };
 
 const getAuthors = (request, response) => {
@@ -64,9 +69,15 @@ const getLanguages = (request, response) => {
   respondJSON(request, response, 200, uniqueLanguages);
 };
 
+const notFound = (request, response) => {
+  const errorMsg = { message: 'The page you are looking for was not found.' };
+  respondJSON(request, response, 404, errorMsg);
+};
+
 module.exports = {
   getBooks,
   getAuthors,
   getGenres,
   getLanguages,
+  notFound,
 };
