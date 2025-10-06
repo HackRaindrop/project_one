@@ -61,6 +61,8 @@ const handleGet = (request, response, parsedURL) => {
       return jsonResponses.getGenres(request, response);
     case '/getLanguages':
       return jsonResponses.getLanguages(request, response);
+    case '/addBook':
+      return jsonResponses.addBook(request, response);
     default:
       // Return 404 for unknown GET endpoints
       return jsonResponses.notFound(request, response);

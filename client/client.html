@@ -31,7 +31,7 @@
                 content.innerHTML = '';
 
                 if (url === '/getBooks') {
-                    // Display books as nice cards
+                    // Display books as cards
                     content.innerHTML = `<h2>Found ${jsonResponse.length} books:</h2>`;
 
                     // Create book cards
@@ -67,7 +67,7 @@
                     genresList += '</ul>';
                     content.innerHTML = `<h2>All Genres (${jsonResponse.length}):</h2>${genresList}`;
                 } else if (url === '/getLanguages') {
-                    
+
                     // Display languages
                     let languagesList = '<ul class="simple-list">';
                     jsonResponse.forEach(language => {
@@ -82,57 +82,52 @@
         });
 
         // Event listener for new user form
-        // nameForm.addEventListener('submit', async (e) => {
-        //     e.preventDefault();
+        nameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        //     // Get form data
-        //     const formData = {
-        //         name: document.getElementById('nameField').value,
-        //         age: document.getElementById('ageField').value,
-        //     };
-        //     try {
+            // Get form data
+            const formData = {
+                title: document.getElementById('bookTitle').value,
+                author: document.getElementById('bookAuthor').value,
+            };
+            try {
 
-        //         // Make fetch request
-        //         const response = await fetch('/addUser', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(formData),
-        //         });
+                // Make fetch request
+                const response = await fetch('/addBook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
 
-        //         let message = '';
+                // Handle 201 and 204 responses
+                if (response.status === 201 || response.status === 204) {
+                    const statusText = response.status === 201 ? 'Created' : 'Updated (No Content)';
 
-        //         // Handle 201 and 204 responses
-        //         if (response.status === 201 || response.status === 204) {
-        //             const statusText = response.status === 201 ? 'Created' : 'Updated (No Content)';
+                    // Show message for 201 response
+                    if (response.status === 201) {
+                        const jsonResponse = await response.json();
+                        console.log(jsonResponse);
+                        content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+                    } else {
 
-        //             // Show message for 201 response
-        //             if (response.status === 201) {
+                        // Show message for 204 response
+                        content.innerHTML = `<b>${statusText}</b>`;
+                    }
+                } else {
 
-        //                 const jsonResponse = await response.json();
-        //                 console.log(jsonResponse);
-        //                 content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
-
-        //             } else {
-
-        //                 // Show message for 204 response
-        //                 content.innerHTML = `<b>${statusText}</b>`;
-        //             }
-        //         } else {
-
-        //             // Show message for other responses
-        //             const jsonResponse = await response.json();
-        //             console.log(jsonResponse);
-        //             const statusText = response.status === 200 ? 'Success' : response.statusText;
-        //             content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
-        //         }
-        //     } catch (error) {
-        //         content.textContent = `${error.message}`;
-        //     }
-        // });
+                    // Show message for other responses
+                    const jsonResponse = await response.json();
+                    console.log(jsonResponse);
+                    const statusText = response.status === 200 ? 'Success' : response.statusText;
+                    content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+                }
+            } catch (error) {
+                content.textContent = `${error.message}`;
+            }
+        });
     });
-
 </script>
 
 <body>
@@ -146,7 +141,15 @@
                 <option value="/getLanguages">/getLanguages</option>
             </select>
             <input type="submit" value="Get Books">
-
+        </form>
+        <br>
+        <h2>Add A Book</h2>
+        <form id="postRequests" action="/addBook" method="post">
+            <label for="title">Title: </label>
+            <input id="bookTitle" type="text" name="title">
+            <label for="author">Author: </label>
+            <input id="bookAuthor" type="text" name="author">
+            <input type="submit" value="Add Book">
         </form>
         <section id="content"></section>
     </section>

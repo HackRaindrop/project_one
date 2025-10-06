@@ -74,10 +74,50 @@ const notFound = (request, response) => {
   respondJSON(request, response, 404, errorMsg);
 };
 
+// Add user to users object
+const addBook = (request, response) => {
+  const responseJSON = {
+    message: 'Name and age are both required.',
+  };
+
+  const { title, author } = request.body;
+
+  // If either author or title is missing, send 400
+  if (!title || !author) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  // Default to 204 updated
+  let responseCode = 204;
+
+  // If user doesn't exist
+  if (!books[author]) {
+    responseCode = 201;
+
+    // Create empty user
+    books[author] = {
+      author,
+    };
+  }
+
+  books[author].title = title;
+
+  // If user is created, send sucess
+  if (responseCode === 201) {
+    responseJSON.message = 'Created Successfully';
+    return respondJSON(request, response, responseCode, responseJSON);
+  }
+
+  // 204, no content to send back
+  return respondJSON(request, response, responseCode, {});
+};
+
 module.exports = {
   getBooks,
   getAuthors,
   getGenres,
   getLanguages,
   notFound,
+  addBook,
 };
