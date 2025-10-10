@@ -77,7 +77,7 @@ const notFound = (request, response) => {
 // Add user to users object
 const addBook = (request, response) => {
   const responseJSON = {
-    message: 'Name and age are both required.',
+    message: 'Title and author are both required.',
   };
 
   const { title, author } = request.body;
@@ -92,16 +92,16 @@ const addBook = (request, response) => {
   let responseCode = 204;
 
   // If user doesn't exist
-  if (!books[author]) {
+  if (!books[title]) {
     responseCode = 201;
 
     // Create empty user
-    books[author] = {
+    books[title] = {
       author,
     };
   }
 
-  books[author].title = title;
+  books[title].author = author;
 
   // If user is created, send sucess
   if (responseCode === 201) {

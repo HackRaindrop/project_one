@@ -64,7 +64,6 @@ const handleGet = (request, response, parsedURL) => {
     case '/addBook':
       return jsonResponses.addBook(request, response);
     default:
-      // Return 404 for unknown GET endpoints
       return jsonResponses.notFound(request, response);
   }
 };
@@ -83,4 +82,3 @@ const onRequest = (request, response) => {
 
 // Create server
 http.createServer(onRequest).listen(port);
-console.log(`Listening on 127.0.0.1: ${port}`);

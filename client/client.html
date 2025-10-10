@@ -13,7 +13,7 @@
         const userForm = document.getElementById('getRequests');
         const urlField = document.getElementById('urlField');
         const content = document.getElementById('content');
-        //const nameForm = document.getElementById('nameForm')
+        const bookForm = document.getElementById('postRequests')
 
         content.innerHTML = '';
 
@@ -82,7 +82,7 @@
         });
 
         // Event listener for new user form
-        nameForm.addEventListener('submit', async (e) => {
+        bookForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             // Get form data
