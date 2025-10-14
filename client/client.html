@@ -13,25 +13,29 @@
         const userForm = document.getElementById('getRequests');
         const urlField = document.getElementById('urlField');
         const content = document.getElementById('content');
-        const bookForm = document.getElementById('postRequests');
+        const bookForm = document.getElementById('addBookForm');
         const bookLanguage = document.getElementById('bookLanguage');
+        const reviewForm = document.getElementById('reviewBookForm');
+        const bookSelect = document.getElementById('bookSelect');
 
         content.innerHTML = '';
 
         // Load languages for dropdown
         const loadLanguages = async () => {
             try {
-                const response = await fetch('/getLanguages');
+                const response = await fetch('/getLanguages', {
+                    headers: { 'Accept': 'application/json' }
+                });
                 const languages = await response.json();
-                
+
                 // Clear loading option
                 bookLanguage.innerHTML = '<option value="">Select a language...</option>';
-                
+
                 // Add each language as an option
-                languages.forEach(language => {
+                languages.forEach(languageObj => {
                     const option = document.createElement('option');
-                    option.value = language;
-                    option.textContent = language;
+                    option.value = languageObj.language;
+                    option.textContent = languageObj.language;
                     bookLanguage.appendChild(option);
                 });
             } catch (error) {
@@ -39,8 +43,32 @@
             }
         };
 
-        // Load languages on page load
+        // Load books for review dropdown
+        const loadBooks = async () => {
+            try {
+                const response = await fetch('/getBooks', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const books = await response.json();
+
+                // Clear loading option
+                bookSelect.innerHTML = '<option value="">Select a book...</option>';
+
+                // Add each book as an option
+                books.forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book.title;
+                    option.textContent = `${book.title} by ${book.author}`;
+                    bookSelect.appendChild(option);
+                });
+            } catch (error) {
+                bookSelect.innerHTML = '<option value="">Error loading books</option>';
+            }
+        };
+
+        // Load languages and books on page load
         loadLanguages();
+        loadBooks();
 
         userForm.addEventListener('submit', async (e) => {
 
@@ -49,7 +77,9 @@
 
             try {
 
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/json' }
+                });
                 const jsonResponse = await response.json();
 
                 // Clear previous content
@@ -70,36 +100,58 @@
                                 <p><strong>Language:</strong> ${book.language}</p>
                                 <p><strong>Country:</strong> ${book.country}</p>
                                 ${book.genres ? `<p><strong>Genres:</strong> ${book.genres.join(', ')}</p>` : ''}
+                                ${book.reviews && book.reviews.length > 0 ?
+                                `<p><strong>Review:</strong> ${book.reviews[0].rating}/5 stars - ${book.reviews[0].review || 'No written review'}</p>` :
+                                '<p><em>No reviews yet</em></p>'
+                            }
                             </div>
                         `;
                     });
                 } else if (url === '/getAuthors') {
 
-                    // Display authors
-                    let authorsList = '<ul class="simple-list">';
-                    jsonResponse.forEach(author => {
-                        authorsList += `<li>${author}</li>`;
+                    // Display authors with book counts and samples
+                    content.innerHTML = `<h2>All Authors (${jsonResponse.length}):</h2>`;
+                    jsonResponse.forEach(authorObj => {
+                        const sampleBooks = authorObj.books.slice(0, 3).map(book => book.title).join(', ');
+                        const moreText = authorObj.books.length > 3 ? ` and ${authorObj.books.length - 3} more...` : '';
+                        content.innerHTML += `
+                            <div class="book-card">
+                                <h3>${authorObj.author}</h3>
+                                <p><strong>Books:</strong> ${authorObj.count}</p>
+                                <p><strong>Sample titles:</strong> ${sampleBooks}${moreText}</p>
+                            </div>
+                        `;
                     });
-                    authorsList += '</ul>';
-                    content.innerHTML = `<h2>All Authors (${jsonResponse.length}):</h2>${authorsList}`;
                 } else if (url === '/getGenres') {
 
-                    // Display genres
-                    let genresList = '<ul class="simple-list">';
-                    jsonResponse.forEach(genre => {
-                        genresList += `<li>${genre}</li>`;
+                    // Display genres with book counts and samples
+                    content.innerHTML = `<h2>All Genres (${jsonResponse.length}):</h2>`;
+                    jsonResponse.forEach(genreObj => {
+                        const sampleBooks = genreObj.books.slice(0, 3).map(book => `${book.title} by ${book.author}`).join(', ');
+                        const moreText = genreObj.books.length > 3 ? ` and ${genreObj.books.length - 3} more...` : '';
+                        content.innerHTML += `
+                            <div class="book-card">
+                                <h3>${genreObj.genre}</h3>
+                                <p><strong>Books:</strong> ${genreObj.count}</p>
+                                <p><strong>Sample books:</strong> ${sampleBooks}${moreText}</p>
+                            </div>
+                        `;
                     });
-                    genresList += '</ul>';
-                    content.innerHTML = `<h2>All Genres (${jsonResponse.length}):</h2>${genresList}`;
                 } else if (url === '/getLanguages') {
 
-                    // Display languages
-                    let languagesList = '<ul class="simple-list">';
-                    jsonResponse.forEach(language => {
-                        languagesList += `<li>${language}</li>`;
+                    // Display languages with book counts and samples
+                    content.innerHTML = `<h2>All Languages (${jsonResponse.length}):</h2>`;
+                    jsonResponse.forEach(languageObj => {
+                        const sampleBooks = languageObj.books.slice(0, 3).map(book => `${book.title} by ${book.author}`).join(', ');
+                        const moreText = languageObj.books.length > 3 ? ` and ${languageObj.books.length - 3} more...` : '';
+                        content.innerHTML += `
+                            <div class="book-card">
+                                <h3>${languageObj.language}</h3>
+                                <p><strong>Books:</strong> ${languageObj.count}</p>
+                                <p><strong>Sample books:</strong> ${sampleBooks}${moreText}</p>
+                            </div>
+                        `;
                     });
-                    languagesList += '</ul>';
-                    content.innerHTML = `<h2>All Languages (${jsonResponse.length}):</h2>${languagesList}`;
                 }
             } catch (error) {
                 content.textContent = `${error.message}`;
@@ -123,6 +175,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                     },
                     body: JSON.stringify(formData),
                 });
@@ -153,6 +206,53 @@
                 content.textContent = `${error.message}`;
             }
         });
+
+        // Event listener for review form
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                title: document.getElementById('bookSelect').value,
+                rating: document.getElementById('bookRating').value,
+                review: document.getElementById('bookReview').value,
+            };
+
+            try {
+                // Make fetch request
+                const response = await fetch('/reviewBook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Handle 201 and 204 responses
+                if (response.status === 201 || response.status === 204) {
+                    const statusText = response.status === 201 ? 'Review Added' : 'Review Updated';
+
+                    // Show message for 201 response
+                    if (response.status === 201) {
+                        const jsonResponse = await response.json();
+                        console.log(jsonResponse);
+                        content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+                    } else {
+                        // Show message for 204 response
+                        content.innerHTML = `<b>${statusText}</b>`;
+                    }
+                } else {
+                    // Show message for other responses
+                    const jsonResponse = await response.json();
+                    console.log(jsonResponse);
+                    const statusText = response.status === 400 ? 'Bad Request' : response.statusText;
+                    content.innerHTML = `<b>${statusText}</b><br>Message: ${jsonResponse.message}`;
+                }
+            } catch (error) {
+                content.textContent = `${error.message}`;
+            }
+        });
     });
 </script>
 
@@ -170,7 +270,7 @@
         </form>
         <br>
         <h2>Add A Book</h2>
-        <form id="postRequests" action="/addBook" method="post">
+        <form id="addBookForm" action="/addBook" method="post">
             <label for="title">Title: </label>
             <input id="bookTitle" type="text" name="title">
             <label for="author">Author: </label>
@@ -181,7 +281,37 @@
             </select>
             <input type="submit" value="Add Book">
         </form>
+        <br>
+        <h2>Review A Book</h2>
+        <form id="reviewBookForm" action="/reviewBook" method="post">
+            <label for="bookSelect">Book: </label>
+            <select id="bookSelect" name="title">
+                <option value="">Loading books...</option>
+            </select>
+            <br><br>
+            <label for="rating">Rating: </label>
+            <select id="bookRating" name="rating">
+                <option value="">Select rating...</option>
+                <option value="1">1 star</option>
+                <option value="2">2 stars</option>
+                <option value="3">3 stars</option>
+                <option value="4">4 stars</option>
+                <option value="5">5 stars</option>
+            </select>
+            <br><br>
+            <label for="review">Review (optional): </label>
+            <br>
+            <textarea id="bookReview" name="review" rows="4" cols="50"
+                placeholder="Write your review here..."></textarea>
+            <br><br>
+            <input type="submit" value="Submit Review">
+        </form>
         <section id="content"></section>
+
+        <div style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #ccc;">
+            <p><a href="doc.html" style="color: #007bff; text-decoration: none; font-size: 16px;">View API
+                    Documentation</a></p>
+        </div>
     </section>
 </body>
 

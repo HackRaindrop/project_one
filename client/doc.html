@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Book API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .endpoint {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+
+        .method {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .param-table {
+            border: 1px solid #000;
+            margin: 10px 0;
+        }
+
+        .param-table th,
+        .param-table td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+
+        .param-table th {
+            background-color: #ddd;
+        }
+
+        .required {
+            color: red;
+        }
+
+        .optional {
+            color: green;
+        }
+
+        code {
+            background: #eee;
+            font-family: monospace;
+        }
+
+        pre {
+            background: #eee;
+            padding: 10px;
+            border: 1px solid #000;
+            font-family: monospace;
+        }
+
+        .response-format {
+            background: #ddd;
+            padding: 10px;
+            border: 1px solid #000;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="documentation">
+        <h1>My Book API Documentation</h1>
+        <p>Documentation for my book API endpoints</p>
+
+        <!-- GET /getBooks -->
+        <div class="endpoint">
+            <h2>GET/HEAD /getBooks</h2>
+            <p><strong>Description:</strong> Retrieve books with optional filtering and pagination.</p>
+
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>author</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by author name</td>
+                </tr>
+                <tr>
+                    <td><code>genre</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by genre</td>
+                </tr>
+                <tr>
+                    <td><code>language</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by language</td>
+                </tr>
+                <tr>
+                    <td><code>yearFrom</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter books published from this year onwards</td>
+                </tr>
+                <tr>
+                    <td><code>yearTo</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter books published up to this year</td>
+                </tr>
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Search across book titles and authors</td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Maximum number of books to return</td>
+                </tr>
+            </table>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 200 OK, 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Array of book objects
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>GET /getBooks
+GET /getBooks?author=shakespeare&limit=5
+GET /getBooks?genre=poetry&yearFrom=1800&yearTo=1900
+GET /getBooks?search=war&language=english
+
+Response:
+[
+  {
+    "title": "Hamlet",
+    "author": "William Shakespeare",
+    "year": 1603,
+    "pages": 432,
+    "language": "English",
+    "country": "England",
+    "genres": ["Tragedy", "Classic Literature"],
+    "reviews": [
+      {
+        "rating": 5,
+        "review": "Masterpiece of literature"
+      }
+    ]
+  }
+]</code></pre>
+        </div>
+
+        <!-- GET /getAuthors -->
+        <div class="endpoint">
+            <h2>GET/HEAD /getAuthors</h2>
+            <p><strong>Description:</strong> Get authors with their books.</p>
+
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>author</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by specific author name</td>
+                </tr>
+                <tr>
+                    <td><code>genre</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter authors who wrote in this genre</td>
+                </tr>
+                <tr>
+                    <td><code>language</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter authors who wrote in this language</td>
+                </tr>
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Search across author names and book titles</td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Maximum number of authors to return</td>
+                </tr>
+            </table>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 200 OK, 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Array of author objects with book counts
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>GET /getAuthors
+GET /getAuthors?genre=tragedy&limit=3
+GET /getAuthors?language=russian
+
+Response:
+[
+  {
+    "author": "William Shakespeare",
+    "count": 3,
+    "books": [
+      {
+        "title": "Hamlet",
+        "author": "William Shakespeare",
+        "year": 1603,
+        ...
+      }
+    ]
+  }
+]</code></pre>
+        </div>
+
+        <!-- GET /getGenres -->
+        <div class="endpoint">
+            <h2>GET/HEAD /getGenres</h2>
+            <p><strong>Description:</strong> Get genres with their books.</p>
+
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>genre</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by specific genre name</td>
+                </tr>
+                <tr>
+                    <td><code>author</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter genres written by this author</td>
+                </tr>
+                <tr>
+                    <td><code>language</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter genres in this language</td>
+                </tr>
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Search across book titles and authors</td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Maximum number of genres to return</td>
+                </tr>
+            </table>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 200 OK, 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Array of genre objects with book counts
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>GET /getGenres
+GET /getGenres?author=austen&limit=5
+GET /getGenres?language=french
+
+Response:
+[
+  {
+    "genre": "Classic Literature",
+    "count": 25,
+    "books": [
+      {
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        ...
+      }
+    ]
+  }
+]</code></pre>
+        </div>
+
+        <!-- GET /getLanguages -->
+        <div class="endpoint">
+            <h2>GET/HEAD /getLanguages</h2>
+            <p><strong>Description:</strong> Get languages with their books.</p>
+
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>language</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter by specific language</td>
+                </tr>
+                <tr>
+                    <td><code>author</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter languages written by this author</td>
+                </tr>
+                <tr>
+                    <td><code>genre</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Filter languages for this genre</td>
+                </tr>
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Search across book titles and authors</td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td class="optional">Optional</td>
+                    <td>Maximum number of languages to return</td>
+                </tr>
+            </table>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 200 OK, 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Array of language objects with book counts
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>GET /getLanguages
+GET /getLanguages?genre=poetry&limit=3
+GET /getLanguages?author=tolstoy
+
+Response:
+[
+  {
+    "language": "English",
+    "count": 42,
+    "books": [
+      {
+        "title": "Hamlet",
+        "author": "William Shakespeare",
+        ...
+      }
+    ]
+  }
+]</code></pre>
+        </div>
+
+        <!-- POST /addBook -->
+        <div class="endpoint">
+            <h2>POST /addBook</h2>
+            <p><strong>Description:</strong> Add a new book or update an existing one.</p>
+
+            <h3>Body Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>title</code></td>
+                    <td>string</td>
+                    <td class="required">Required</td>
+                    <td>Book title (used as unique identifier)</td>
+                </tr>
+                <tr>
+                    <td><code>author</code></td>
+                    <td>string</td>
+                    <td class="required">Required</td>
+                    <td>Author name</td>
+                </tr>
+                <tr>
+                    <td><code>language</code></td>
+                    <td>string</td>
+                    <td class="required">Required</td>
+                    <td>Language the book is written in</td>
+                </tr>
+            </table>
+
+            <h3>Supported Content Types</h3>
+            <ul>
+                <li><code>application/json</code></li>
+                <li><code>application/x-www-form-urlencoded</code></li>
+            </ul>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 201 Created (new book), 204 No Content (updated book), 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Success message (201 only)
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>POST /addBook
+Content-Type: application/json
+
+{
+  "title": "New Book",
+  "author": "Author Name",
+  "language": "English"
+}
+
+Response (201):
+{
+  "message": "Created Successfully"
+}
+
+Response (204): No content body</code></pre>
+        </div>
+
+        <!-- POST /reviewBook -->
+        <div class="endpoint">
+            <h2>POST /reviewBook</h2>
+            <p><strong>Description:</strong> Add or update a book review.</p>
+
+            <h3>Body Parameters</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>title</code></td>
+                    <td>string</td>
+                    <td class="required">Required</td>
+                    <td>Title of the book to review</td>
+                </tr>
+                <tr>
+                    <td><code>rating</code></td>
+                    <td>integer</td>
+                    <td class="required">Required</td>
+                    <td>Rating from 1-5 stars</td>
+                </tr>
+                <tr>
+                    <td><code>review</code></td>
+                    <td>string</td>
+                    <td class="optional">Optional</td>
+                    <td>Written review text</td>
+                </tr>
+            </table>
+
+            <h3>Supported Content Types</h3>
+            <ul>
+                <li><code>application/json</code></li>
+                <li><code>application/x-www-form-urlencoded</code></li>
+            </ul>
+
+            <h3>Response Format</h3>
+            <div class="response-format">
+                <strong>Status:</strong> 201 Created (new review), 204 No Content (updated review), 400 Bad Request<br>
+                <strong>Content-Type:</strong> application/json<br>
+                <strong>Body:</strong> Success message (201 only)
+            </div>
+
+            <h3>Example Usage</h3>
+            <pre><code>POST /reviewBook
+Content-Type: application/json
+
+{
+  "title": "Hamlet",
+  "rating": 5,
+  "review": "A masterpiece of literature"
+}
+
+Response (201):
+{
+  "message": "Review added successfully"
+}
+
+Response (204): No content body</code></pre>
+        </div>
+
+        <!-- Error Responses -->
+        <div class="endpoint">
+            <h2>Errors</h2>
+            <p><strong>Description:</strong> Error responses you might get.</p>
+
+            <h3>Status Codes</h3>
+            <table class="param-table">
+                <tr>
+                    <th>Status Code</th>
+                    <th>Description</th>
+                    <th>Common Causes</th>
+                </tr>
+                <tr>
+                    <td><code>400</code></td>
+                    <td>Bad Request</td>
+                    <td>Invalid parameters, malformed JSON, missing required fields</td>
+                </tr>
+                <tr>
+                    <td><code>404</code></td>
+                    <td>Not Found</td>
+                    <td>Invalid endpoint URL, book not found</td>
+                </tr>
+            </table>
+
+            <h3>Error Response Format</h3>
+            <pre><code>{
+  "message": "Error description",
+  "id": "errorCode" // Optional error identifier
+}</code></pre>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="/" style="color: #007bff; text-decoration: none;">Back to Main Page</a>
+        </div>
+    </section>
+</body>
+
+</html>
