@@ -13,9 +13,34 @@
         const userForm = document.getElementById('getRequests');
         const urlField = document.getElementById('urlField');
         const content = document.getElementById('content');
-        const bookForm = document.getElementById('postRequests')
+        const bookForm = document.getElementById('postRequests');
+        const bookLanguage = document.getElementById('bookLanguage');
 
         content.innerHTML = '';
+
+        // Load languages for dropdown
+        const loadLanguages = async () => {
+            try {
+                const response = await fetch('/getLanguages');
+                const languages = await response.json();
+                
+                // Clear loading option
+                bookLanguage.innerHTML = '<option value="">Select a language...</option>';
+                
+                // Add each language as an option
+                languages.forEach(language => {
+                    const option = document.createElement('option');
+                    option.value = language;
+                    option.textContent = language;
+                    bookLanguage.appendChild(option);
+                });
+            } catch (error) {
+                bookLanguage.innerHTML = '<option value="">Error loading languages</option>';
+            }
+        };
+
+        // Load languages on page load
+        loadLanguages();
 
         userForm.addEventListener('submit', async (e) => {
 
@@ -89,6 +114,7 @@
             const formData = {
                 title: document.getElementById('bookTitle').value,
                 author: document.getElementById('bookAuthor').value,
+                language: document.getElementById('bookLanguage').value,
             };
             try {
 
@@ -149,6 +175,10 @@
             <input id="bookTitle" type="text" name="title">
             <label for="author">Author: </label>
             <input id="bookAuthor" type="text" name="author">
+            <label for="language">Language: </label>
+            <select id="bookLanguage" name="language">
+                <option value="">Loading languages...</option>
+            </select>
             <input type="submit" value="Add Book">
         </form>
         <section id="content"></section>

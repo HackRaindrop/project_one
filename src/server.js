@@ -39,8 +39,8 @@ const parseBody = (request, response, handler) => {
 
 // Handle POST requests
 const handlePost = (request, response, parsedURL) => {
-  if (parsedURL.pathname === '/addUser') {
-    return parseBody(request, response, jsonResponses.addUser);
+  if (parsedURL.pathname === '/addBook') {
+    return parseBody(request, response, jsonResponses.addBook);
   }
   // Return 404 for unknown POST endpoints
   return jsonResponses.notFound(request, response);
@@ -61,8 +61,6 @@ const handleGet = (request, response, parsedURL) => {
       return jsonResponses.getGenres(request, response);
     case '/getLanguages':
       return jsonResponses.getLanguages(request, response);
-    case '/addBook':
-      return jsonResponses.addBook(request, response);
     default:
       return jsonResponses.notFound(request, response);
   }

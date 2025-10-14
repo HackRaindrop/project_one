@@ -43,7 +43,7 @@ const getAuthors = (request, response) => {
   // Create set of unique authors and sort
   const uniqueAuthors = [...new Set(authorNames)].sort();
 
-  respondJSON(request, response, 200, uniqueAuthors);
+  return respondJSON(request, response, 200, uniqueAuthors);
 };
 
 const getGenres = (request, response) => {
@@ -57,7 +57,7 @@ const getGenres = (request, response) => {
   // Create set of unique genres and sort
   const uniqueGenres = [...new Set(allGenres)].sort();
 
-  respondJSON(request, response, 200, uniqueGenres);
+  return respondJSON(request, response, 200, uniqueGenres);
 };
 
 const getLanguages = (request, response) => {
@@ -66,51 +66,47 @@ const getLanguages = (request, response) => {
   // Create set of unique languages and sort
   const uniqueLanguages = [...new Set(languageNames)].sort();
 
-  respondJSON(request, response, 200, uniqueLanguages);
+  return respondJSON(request, response, 200, uniqueLanguages);
 };
 
 const notFound = (request, response) => {
   const errorMsg = { message: 'The page you are looking for was not found.' };
-  respondJSON(request, response, 404, errorMsg);
+  return respondJSON(request, response, 404, errorMsg);
 };
 
-// Add user to users object
+// Add book to books array
 const addBook = (request, response) => {
   const responseJSON = {
-    message: 'Title and author are both required.',
+    message: 'Title, author, and language are required.',
   };
 
-  const { title, author } = request.body;
+  const { title, author, language } = request.body;
 
   // If either author or title is missing, send 400
-  if (!title || !author) {
+  if (!title || !author || !language) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
-  // Default to 204 updated
-  let responseCode = 204;
-
-  // If user doesn't exist
-  if (!books[title]) {
-    responseCode = 201;
-
-    // Create empty user
-    books[title] = {
-      author,
-    };
+  // Check if book already exists
+  const existingBook = books.find((book) => book.title === title);
+  if (existingBook) {
+    // Update existing book (204)
+    existingBook.author = author;
+    existingBook.language = language;
+    return respondJSON(request, response, 204, {});
   }
-
-  books[title].author = author;
-
-  // If user is created, send sucess
-  if (responseCode === 201) {
-    responseJSON.message = 'Created Successfully';
-    return respondJSON(request, response, responseCode, responseJSON);
-  }
-
-  // 204, no content to send back
-  return respondJSON(request, response, responseCode, {});
+  // Create new book (201)
+  books.push({
+    title,
+    author,
+    year: new Date().getFullYear(),
+    pages: 0,
+    language,
+    country: 'Unknown',
+  });
+  responseJSON.message = 'Created Successfully';
+  return respondJSON(request, response, 201, responseJSON);
 };
 
 module.exports = {
